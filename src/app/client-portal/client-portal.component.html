@@ -1,0 +1,71 @@
+<!-- client-portal.component.html -->
+<h1>Mercedes Client Portal</h1>
+
+<div *ngIf="car; else loading">
+  <p><strong>Plate:</strong> {{ car.plate }}</p>
+  <p><strong>Model:</strong> {{ car.model }}</p>
+  <p><strong>Service Type:</strong> {{ car.serviceType }}</p>
+  <p><strong>Status:</strong> {{ car.status }}</p>
+</div>
+
+<ng-template #loading>
+  <p>Loading car information...</p>
+</ng-template>
+
+<hr>
+
+<div *ngIf="videoSummary">
+  <h3>Technician Video & Comment</h3>
+  <video width="100%" height="auto" controls [src]="baseUrl + '/api/advisor/videos/' + videoSummary.videoPath"></video>
+  <p><strong>Technician's Comment:</strong> {{ videoSummary.comment }}</p>
+</div>
+
+<hr>
+
+<div *ngIf="devis">
+  <h3>Devis Parts</h3>
+  <div *ngFor="let item of devis.items" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+    <p><strong>Description:</strong> {{ item.description }}</p>
+    <p><strong>Part Number:</strong> {{ item.partNumber }}</p>
+    <p><strong>Quantity:</strong> {{ item.qty }}</p>
+    <p><strong>Amount:</strong> {{ item.amount }} TND</p>
+
+    <label>
+      <input type="radio" [(ngModel)]="item.accepted" [value]="true"> Accept
+    </label>
+    <label style="margin-left: 20px;">
+      <input type="radio" [(ngModel)]="item.accepted" [value]="false"> Reject
+    </label>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <p><strong>Subtotal:</strong> {{ devis.subtotal }} TND</p>
+    <p><strong>Discount:</strong> {{ devis.discount }} TND</p>
+    <p><strong>Tax:</strong> {{ devis.tax }} %</p>
+    <p><strong>Total:</strong> {{ devis.total }} TND</p>
+  </div>
+</div>
+
+<hr>
+
+<div *ngIf="labor.length > 0">
+  <h3>Service Labor</h3>
+  <div *ngFor="let l of labor" style="border: 1px dashed #aaa; padding: 8px; margin-bottom: 10px;">
+    <p><strong>Service:</strong> {{ l.name }}</p>
+    <p><strong>Amount:</strong> {{ l.amount }} TND</p>
+  </div>
+</div>
+
+<!-- ✅ Final Total after parts and labor -->
+<div *ngIf="devis" style="margin-top: 20px;">
+  <p><strong>Final Total (Parts + Labor):</strong> {{ grandTotal }} TND</p>
+</div>
+
+<hr>
+
+<h3>Leave a Comment</h3>
+<textarea [(ngModel)]="comment" rows="4" cols="50" placeholder="Your comment..."></textarea>
+
+<div style="margin-top: 15px;">
+  <button (click)="submitResponse()">Submit Response</button>
+</div>

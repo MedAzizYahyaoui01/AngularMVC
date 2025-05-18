@@ -1,0 +1,11 @@
+{
+  "/api": {
+    "target": "https://1087-102-159-192-1.ngrok-free.app",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "headers": {
+      "ngrok-skip-browser-warning": "skip-browser-warning"
+    }
+  }
+}
