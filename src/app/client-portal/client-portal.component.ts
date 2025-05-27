@@ -18,8 +18,10 @@ import { BASE_URL } from '../../config';
 export class ClientPortalComponent implements OnInit {
   baseUrl = BASE_URL;
   plate: string | null = null;
+  folderName: string | null = null;
   car: Car | null = null;
   videoSummary: VideoSummary | null = null;
+  advisorComment: string = '';
   devis: Devis | null = null;
   labor: any[] = [];
   comment: string = '';
@@ -28,25 +30,32 @@ export class ClientPortalComponent implements OnInit {
 
   ngOnInit(): void {
     this.plate = this.route.snapshot.paramMap.get('plate');
-    if (!this.plate) return;
+    this.folderName = this.route.snapshot.paramMap.get('folderName');
+
+    if (!this.plate || !this.folderName) return;
 
     const encodedPlate = encodeURIComponent(this.plate.trim());
+    const encodedFolder = encodeURIComponent(this.folderName.trim());
     const headers = new HttpHeaders({ 'Accept': 'application/json' });
 
+    // Fetch car info
     this.http.get<Car>(`${this.baseUrl}/api/cars/${encodedPlate}`, { headers }).subscribe({
       next: (data) => this.car = data,
       error: (err) => console.error('Car error:', err)
     });
 
-    this.http.get<any>(`${this.baseUrl}/api/advisor/summary/${encodedPlate}`, { headers }).subscribe({
+    // Fetch advisor summary (video, devis, labor, etc.)
+    this.http.get<any>(`${this.baseUrl}/api/advisor/summary/${encodedPlate}/${encodedFolder}`, { headers }).subscribe({
       next: (data) => {
         this.videoSummary = {
           videoPath: data.videoPath,
           comment: data.comment
         };
 
+        this.advisorComment = data.advisorComment || '';
+
         this.devis = {
-           devisId: data.devisId,
+          devisId: data.devisId,
           items: data.items.map((item: any) => ({ ...item, accepted: true })),
           subtotal: data.devis.subtotal,
           discount: data.devis.discount,
@@ -54,57 +63,41 @@ export class ClientPortalComponent implements OnInit {
           total: data.devis.total
         };
 
-        this.labor = data.labor || [];
+        this.labor = (data.labor || []).flatMap((group: any) => group.items || []);
       },
       error: (err) => console.error('Summary error:', err)
     });
   }
 
   submitResponse() {
-    console.log('📤 Submit button clicked');
-    
-
-
-    if (!this.plate || !this.devis) {
-      console.warn('❌ Missing plate or devis');
-      return;
-    }
-
+    if (!this.plate || !this.devis) return;
 
     const responses: { [key: string]: string } = {};
-      this.devis.items.forEach((item, index) => {
-      const key = item.id
-        ? item.id.toString()
-        : item.description || item.partNumber || `item-${index}`;
+    this.devis.items.forEach((item, index) => {
+      const key = item.description || `item-${index}`;
       responses[key] = item.accepted ? 'accepted' : 'rejected';
     });
-
 
     const body = {
       plate: this.plate,
       devisId: this.devis.devisId,
+      folderName: this.folderName,
       responses,
       comment: this.comment
     };
 
     this.http.post(`${this.baseUrl}/api/client/submit`, body).subscribe({
-      next: () => {
-        console.log('✅ API call success. Redirecting...');
-        window.location.href = '/assets/thank-you.html';
-      },
+      next: () => window.location.href = '/assets/thank-you.html',
       error: (err) => {
-        console.error('❌ Submit error:', err);
+        console.error('Submit error:', err);
         alert('Submission failed.');
       }
     });
   }
-    get grandTotal(): number {
+
+  get grandTotal(): number {
     const devisTotal = this.devis?.total ?? 0;
-    const laborTotal = this.labor?.reduce((sum, l) => sum + (l.amount || 0), 0);
+    const laborTotal = this.labor?.reduce((sum, l) => sum + (+l.amount || 0), 0);
     return devisTotal + laborTotal;
   }
-
-
-
-
 }

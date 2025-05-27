@@ -1,71 +1,198 @@
-<!-- client-portal.component.html -->
-<h1>Mercedes Client Portal</h1>
+<!-- HTML Code - Copy everything below into your client-portal.component.html -->
 
-<div *ngIf="car; else loading">
-  <p><strong>Plate:</strong> {{ car.plate }}</p>
-  <p><strong>Model:</strong> {{ car.model }}</p>
-  <p><strong>Service Type:</strong> {{ car.serviceType }}</p>
-  <p><strong>Status:</strong> {{ car.status }}</p>
-</div>
+<!-- Invoice Header -->
+<!-- Header with Mercedes Logo -->
+<div class="container">
+  <div class="mercedes-header">
+    <img src="https://www.mercedes-benz.com/content/dam/brandhub/global/logos/MB-star_n_web.svg" alt="Mercedes-Benz Logo" class="mercedes-logo">
+    <div class="header-content">
+      <div class="invoice-title">FACTURE MERCEDES-BENZ</div>
+      <div class="invoice-number">N° SRV-2025</div>
+    </div>
+  </div>
+  
+  <!-- Rest of your HTML... -->
 
-<ng-template #loading>
-  <p>Loading car information...</p>
-</ng-template>
 
-<hr>
+  <!-- Client Info -->
+  <div class="client-info">
+    <div class="client-info-item">
+      <div class="client-info-label">N° Client:</div>
+      <div class="client-info-value">{{ car?.clientCode || '41101213' }}</div>
+    </div>
+    <div class="client-info-item">
+      <div class="client-info-label">Date:</div>
+      <div class="client-info-value">26/05/2025</div>
+    </div>
+    <div class="client-info-item">
+      <div class="client-info-label">Règlement:</div>
+      <div class="client-info-value">À RECEPTION DE FACTURE</div>
+    </div>
+  </div>
 
-<div *ngIf="videoSummary">
-  <h3>Technician Video & Comment</h3>
-  <video width="100%" height="auto" controls [src]="baseUrl + '/api/advisor/videos/' + videoSummary.videoPath"></video>
-  <p><strong>Technician's Comment:</strong> {{ videoSummary.comment }}</p>
-</div>
+  <!-- Vehicle Information Section -->
+  <div class="section-header">Véhicule</div>
+  <div class="vehicle-info" *ngIf="car; else loadingState">
+    <div class="vehicle-info-column">
+      <div class="vehicle-detail">
+        <div class="detail-label">Immatriculation:</div>
+        <div class="detail-value">{{ car.plate }}</div>
+      </div>
+      <div class="vehicle-detail">
+        <div class="detail-label">Marque:</div>
+        <div class="detail-value">{{ car.brand }}</div>
+      </div>
+      <div class="vehicle-detail">
+        <div class="detail-label">Modèle:</div>
+        <div class="detail-value">{{ car.model }}</div>
+      </div>
+      <div class="vehicle-detail">
+        <div class="detail-label">VIN:</div>
+        <div class="detail-value">{{ car.vin }}</div>
+      </div>
+    </div>
+    <div class="vehicle-info-column">
+      <div class="vehicle-detail">
+        <div class="detail-label">Kilométrage:</div>
+        <div class="detail-value">{{ car.mileage }} km</div>
+      </div>
+      <div class="vehicle-detail">
+        <div class="detail-label">Type service:</div>
+        <div class="detail-value">{{ car.serviceType }}</div>
+      </div>
+      <div class="vehicle-detail">
+        <div class="detail-label">Status:</div>
+        <div class="detail-value">
+          <span class="status-indicator">{{ car.status }}</span>
+        </div>
+      </div>
+      <div class="vehicle-detail">
+        <div class="detail-label">Date PMC:</div>
+        <div class="detail-value">{{ car.pmcDate }}</div>
+      </div>
+    </div>
+  </div>
 
-<hr>
+  <!-- Loading State Template -->
+  <ng-template #loadingState>
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading vehicle information...</p>
+    </div>
+  </ng-template>
 
+  <!-- Technician Video & Comment Section -->
+  <div *ngIf="videoSummary">
+    <div class="section-header">Technician Assessment</div>
+    <div class="video-container">
+      <video class="video-player" width="100%" height="auto" controls [src]="baseUrl + '/api/advisor/videos/' + videoSummary.videoPath"></video>
+      <div class="comment-box technician-comment">
+        <h3>Technician's Comment</h3>
+        <p>{{ videoSummary.comment }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advisor Comment Section -->
+  <div *ngIf="advisorComment">
+    <div class="section-header">Service Advisor Notes</div>
+    <div class="comment-section">
+      <div class="comment-box advisor-comment">
+        <p>{{ advisorComment }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parts and Labor Table -->
+  <div *ngIf="devis || labor.length > 0">
+    <div class="section-header">Details of services</div>
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th style="width: 10%;">Reference</th>
+          <th style="width: 40%;">Designation</th>
+          <th style="width: 10%;" class="text-right">Qty</th>
+          <th style="width: 15%;" class="text-right">Unit price.</th>
+          <th style="width: 15%;" class="text-right">Amount</th>
+          <th style="width: 10%;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Parts Items -->
+        <tr *ngFor="let item of devis?.items; let i = index">
+          <td><span class="reference-code">PR</span></td>
+          <td>{{ item.description }}<br><small>{{ item.partNumber }}</small></td>
+          <td class="text-right">{{ item.qty }}</td>
+          <td class="text-right">{{ item.amount / item.qty }} TND</td>
+          <td class="text-right">{{ item.amount }} TND</td>
+          <td>
+            <div class="action-buttons">
+              <button 
+                class="btn btn-accept" 
+                [class.active]="item.accepted === true" 
+                (click)="item.accepted = true">
+                Accept
+              </button>
+              <button 
+                class="btn btn-reject" 
+                [class.active]="item.accepted === false" 
+                (click)="item.accepted = false">
+                Reject
+              </button>
+            </div>
+          </td>
+        </tr>
+        
+        <!-- Labor Items -->
+        <tr *ngFor="let l of labor" class="labor-row">
+          <td><span class="reference-code">M1</span></td>
+          <td>{{ l.designation }}</td>
+          <td class="text-right">{{ l.qte }}</td>
+          <td class="text-right">{{ l.amount / l.qte }} TND</td>
+          <td class="text-right">{{ l.amount }} TND</td>
+          <td>
+            <!-- Labor items are not typically accepted/rejected individually -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Summary Section -->
 <div *ngIf="devis">
-  <h3>Devis Parts</h3>
-  <div *ngFor="let item of devis.items" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-    <p><strong>Description:</strong> {{ item.description }}</p>
-    <p><strong>Part Number:</strong> {{ item.partNumber }}</p>
-    <p><strong>Quantity:</strong> {{ item.qty }}</p>
-    <p><strong>Amount:</strong> {{ item.amount }} TND</p>
-
-    <label>
-      <input type="radio" [(ngModel)]="item.accepted" [value]="true"> Accept
-    </label>
-    <label style="margin-left: 20px;">
-      <input type="radio" [(ngModel)]="item.accepted" [value]="false"> Reject
-    </label>
+  <div class="section-separator">
   </div>
-
-  <div style="margin-top: 20px;">
-    <p><strong>Subtotal:</strong> {{ devis.subtotal }} TND</p>
-    <p><strong>Discount:</strong> {{ devis.discount }} TND</p>
-    <p><strong>Tax:</strong> {{ devis.tax }} %</p>
-    <p><strong>Total:</strong> {{ devis.total }} TND</p>
-  </div>
+  
+  <table class="summary-table">
+    <tr class="subtotal-row">
+      <td class="summary-label">Subtotal</td>
+      <td class="summary-value">{{ devis.subtotal }} TND</td>
+    </tr>
+    <tr class="discount-row">
+      <td class="summary-label">Discount</td>
+      <td class="summary-value">{{ devis.discount }} TND</td>
+    </tr>
+    <tr class="tax-row">
+      <td class="summary-label">Tax ({{ devis.tax }}% )</td>
+      <td class="summary-value">{{ devis.tax }} TND</td>
+    </tr>
+    <tr class="grand-total-row">
+      <td class="summary-label">NET TO PAY</td>
+      <td class="summary-value grand-total-value">{{ grandTotal }} TND</td>
+    </tr>
+  </table>
 </div>
 
-<hr>
-
-<div *ngIf="labor.length > 0">
-  <h3>Service Labor</h3>
-  <div *ngFor="let l of labor" style="border: 1px dashed #aaa; padding: 8px; margin-bottom: 10px;">
-    <p><strong>Service:</strong> {{ l.name }}</p>
-    <p><strong>Amount:</strong> {{ l.amount }} TND</p>
-  </div>
+<!-- Comment Section with more visible title -->
+<div class="section-separator">
+  <img src="https://www.mercedes-benz.com/content/dam/brandhub/global/logos/MB-star_n_web.svg" alt="Mercedes Star" class="mercedes-star">
 </div>
 
-<!-- ✅ Final Total after parts and labor -->
-<div *ngIf="devis" style="margin-top: 20px;">
-  <p><strong>Final Total (Parts + Labor):</strong> {{ grandTotal }} TND</p>
-</div>
-
-<hr>
-
-<h3>Leave a Comment</h3>
-<textarea [(ngModel)]="comment" rows="4" cols="50" placeholder="Your comment..."></textarea>
-
-<div style="margin-top: 15px;">
-  <button (click)="submitResponse()">Submit Response</button>
+<div class="comment-form">
+  <h3 class="comment-section-title">Client Feedback</h3>
+  <textarea [ngModel]="comment" (ngModelChange)="comment = $event" class="comment-textarea" placeholder="Please provide any additional comments or questions..."></textarea>
+  <button (click)="submitResponse()" class="submit-button">
+    Submit Response
+    <i class="fas fa-paper-plane"></i>
+  </button>
 </div>
