@@ -7,6 +7,7 @@ import { Devis } from '../devis.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BASE_URL } from '../../config';
+import { translations } from './client-portal.translation';
 
 @Component({
   selector: 'app-client-portal',
@@ -17,6 +18,7 @@ import { BASE_URL } from '../../config';
 })
 export class ClientPortalComponent implements OnInit {
   baseUrl = BASE_URL;
+  lang: string | null = null;
   plate: string | null = null;
   folderName: string | null = null;
   car: Car | null = null;
@@ -25,10 +27,12 @@ export class ClientPortalComponent implements OnInit {
   devis: Devis | null = null;
   labor: any[] = [];
   comment: string = '';
+  devisReference: string = '';
 
   constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.lang = this.route.snapshot.paramMap.get('lang') || 'en';
     this.plate = this.route.snapshot.paramMap.get('plate');
     this.folderName = this.route.snapshot.paramMap.get('folderName');
 
@@ -38,15 +42,17 @@ export class ClientPortalComponent implements OnInit {
     const encodedFolder = encodeURIComponent(this.folderName.trim());
     const headers = new HttpHeaders({ 'Accept': 'application/json' });
 
-    // Fetch car info
     this.http.get<Car>(`${this.baseUrl}/api/cars/${encodedPlate}`, { headers }).subscribe({
       next: (data) => this.car = data,
       error: (err) => console.error('Car error:', err)
     });
 
-    // Fetch advisor summary (video, devis, labor, etc.)
     this.http.get<any>(`${this.baseUrl}/api/advisor/summary/${encodedPlate}/${encodedFolder}`, { headers }).subscribe({
       next: (data) => {
+        this.folderName = data.folderName || this.folderName;
+        const refSuffix = data.devisId?.toString().padStart(4, '0') ?? '0000';
+        this.devisReference = `DV-${refSuffix}`;
+
         this.videoSummary = {
           videoPath: data.videoPath,
           comment: data.comment
@@ -97,7 +103,11 @@ export class ClientPortalComponent implements OnInit {
 
   get grandTotal(): number {
     const devisTotal = this.devis?.total ?? 0;
-    const laborTotal = this.labor?.reduce((sum, l) => sum + (+l.amount || 0), 0);
+    const laborTotal = this.labor?.reduce((sum, l) => sum + (+l.amount || 0), 0) ?? 0;
     return devisTotal + laborTotal;
+  }
+
+  translate(key: string): string {
+    return translations[this.lang ?? 'en']?.[key] ?? key;
   }
 }

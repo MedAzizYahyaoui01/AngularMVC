@@ -1,49 +1,51 @@
-<!-- HTML Code - Copy everything below into your client-portal.component.html -->
+<!-- HTML Code - client-portal.component.html with translation support -->
 
-<!-- Invoice Header -->
-<!-- Header with Mercedes Logo -->
 <div class="container">
   <div class="mercedes-header">
-    <img src="https://www.mercedes-benz.com/content/dam/brandhub/global/logos/MB-star_n_web.svg" alt="Mercedes-Benz Logo" class="mercedes-logo">
-    <div class="header-content">
-      <div class="invoice-title">FACTURE MERCEDES-BENZ</div>
-      <div class="invoice-number">N° SRV-2025</div>
+  <img src="https://www.mercedes-benz.com/content/dam/brandhub/global/logos/MB-star_n_web.svg" alt="Mercedes-Benz Logo" class="mercedes-logo">
+  <div class="header-content">
+    <div class="invoice-title">{{ lang === 'fr' ? 'FACTURE MERCEDES-BENZ' : 'MERCEDES-BENZ INVOICE' }}</div>
+    
+    <div class="invoice-meta">
+      <div class="meta-item">
+        <strong>{{ lang === 'fr' ? 'Réf Devis:' : 'Devis Ref:' }}</strong> {{ devisReference }}
+      </div>
+      <div class="meta-item">
+        <strong>{{ lang === 'fr' ? 'Dossier:' : 'Folder:' }}</strong> {{ folderName }}
+      </div>
     </div>
   </div>
-  
-  <!-- Rest of your HTML... -->
+</div>
 
 
-  <!-- Client Info -->
   <div class="client-info">
     <div class="client-info-item">
-      <div class="client-info-label">N° Client:</div>
+      <div class="client-info-label">{{ lang === 'fr' ? 'N° Client:' : 'Client No:' }}</div>
       <div class="client-info-value">{{ car?.clientCode || '41101213' }}</div>
     </div>
     <div class="client-info-item">
-      <div class="client-info-label">Date:</div>
+      <div class="client-info-label">{{ lang === 'fr' ? 'Date:' : 'Date:' }}</div>
       <div class="client-info-value">26/05/2025</div>
     </div>
     <div class="client-info-item">
-      <div class="client-info-label">Règlement:</div>
-      <div class="client-info-value">À RECEPTION DE FACTURE</div>
+      <div class="client-info-label">{{ lang === 'fr' ? 'Règlement:' : 'Payment:' }}</div>
+      <div class="client-info-value">{{ lang === 'fr' ? 'À RECEPTION DE FACTURE' : 'Upon Invoice Reception' }}</div>
     </div>
   </div>
 
-  <!-- Vehicle Information Section -->
-  <div class="section-header">Véhicule</div>
+  <div class="section-header">{{ lang === 'fr' ? 'Véhicule' : 'Vehicle' }}</div>
   <div class="vehicle-info" *ngIf="car; else loadingState">
     <div class="vehicle-info-column">
       <div class="vehicle-detail">
-        <div class="detail-label">Immatriculation:</div>
+        <div class="detail-label">{{ lang === 'fr' ? 'Immatriculation:' : 'Plate Number:' }}</div>
         <div class="detail-value">{{ car.plate }}</div>
       </div>
       <div class="vehicle-detail">
-        <div class="detail-label">Marque:</div>
+        <div class="detail-label">{{ lang === 'fr' ? 'Marque:' : 'Brand:' }}</div>
         <div class="detail-value">{{ car.brand }}</div>
       </div>
       <div class="vehicle-detail">
-        <div class="detail-label">Modèle:</div>
+        <div class="detail-label">{{ lang === 'fr' ? 'Modèle:' : 'Model:' }}</div>
         <div class="detail-value">{{ car.model }}</div>
       </div>
       <div class="vehicle-detail">
@@ -53,11 +55,11 @@
     </div>
     <div class="vehicle-info-column">
       <div class="vehicle-detail">
-        <div class="detail-label">Kilométrage:</div>
+        <div class="detail-label">{{ lang === 'fr' ? 'Kilométrage:' : 'Mileage:' }}</div>
         <div class="detail-value">{{ car.mileage }} km</div>
       </div>
       <div class="vehicle-detail">
-        <div class="detail-label">Type service:</div>
+        <div class="detail-label">{{ lang === 'fr' ? 'Type service:' : 'Service Type:' }}</div>
         <div class="detail-value">{{ car.serviceType }}</div>
       </div>
       <div class="vehicle-detail">
@@ -67,35 +69,32 @@
         </div>
       </div>
       <div class="vehicle-detail">
-        <div class="detail-label">Date PMC:</div>
+        <div class="detail-label">{{ lang === 'fr' ? 'Date PMC:' : 'PMC Date:' }}</div>
         <div class="detail-value">{{ car.pmcDate }}</div>
       </div>
     </div>
   </div>
 
-  <!-- Loading State Template -->
   <ng-template #loadingState>
     <div class="loading-container">
       <div class="loading-spinner"></div>
-      <p class="loading-text">Loading vehicle information...</p>
+      <p class="loading-text">{{ lang === 'fr' ? 'Chargement des informations du véhicule...' : 'Loading vehicle information...' }}</p>
     </div>
   </ng-template>
 
-  <!-- Technician Video & Comment Section -->
   <div *ngIf="videoSummary">
-    <div class="section-header">Technician Assessment</div>
+    <div class="section-header">{{ lang === 'fr' ? 'Évaluation du Technicien' : 'Technician Assessment' }}</div>
     <div class="video-container">
       <video class="video-player" width="100%" height="auto" controls [src]="baseUrl + '/api/advisor/videos/' + videoSummary.videoPath"></video>
       <div class="comment-box technician-comment">
-        <h3>Technician's Comment</h3>
+        <h3>{{ lang === 'fr' ? 'Commentaire du Technicien' : 'Technician\'s Comment' }}</h3>
         <p>{{ videoSummary.comment }}</p>
       </div>
     </div>
   </div>
 
-  <!-- Advisor Comment Section -->
   <div *ngIf="advisorComment">
-    <div class="section-header">Service Advisor Notes</div>
+    <div class="section-header">{{ lang === 'fr' ? 'Notes du Conseiller de Service' : 'Service Advisor Notes' }}</div>
     <div class="comment-section">
       <div class="comment-box advisor-comment">
         <p>{{ advisorComment }}</p>
@@ -103,22 +102,20 @@
     </div>
   </div>
 
-  <!-- Parts and Labor Table -->
   <div *ngIf="devis || labor.length > 0">
-    <div class="section-header">Details of services</div>
+    <div class="section-header">{{ lang === 'fr' ? 'Détails des services' : 'Details of Services' }}</div>
     <table class="invoice-table">
       <thead>
         <tr>
-          <th style="width: 10%;">Reference</th>
-          <th style="width: 40%;">Designation</th>
-          <th style="width: 10%;" class="text-right">Qty</th>
-          <th style="width: 15%;" class="text-right">Unit price.</th>
-          <th style="width: 15%;" class="text-right">Amount</th>
-          <th style="width: 10%;">Action</th>
+          <th>Ref</th>
+          <th>{{ lang === 'fr' ? 'Désignation' : 'Designation' }}</th>
+          <th class="text-right">{{ lang === 'fr' ? 'Qté' : 'Qty' }}</th>
+          <th class="text-right">{{ lang === 'fr' ? 'Prix unitaire' : 'Unit Price' }}</th>
+          <th class="text-right">{{ lang === 'fr' ? 'Montant' : 'Amount' }}</th>
+          <th>{{ lang === 'fr' ? 'Action' : 'Action' }}</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Parts Items -->
         <tr *ngFor="let item of devis?.items; let i = index">
           <td><span class="reference-code">PR</span></td>
           <td>{{ item.description }}<br><small>{{ item.partNumber }}</small></td>
@@ -127,72 +124,60 @@
           <td class="text-right">{{ item.amount }} TND</td>
           <td>
             <div class="action-buttons">
-              <button 
-                class="btn btn-accept" 
-                [class.active]="item.accepted === true" 
-                (click)="item.accepted = true">
-                Accept
+              <button class="btn btn-accept" [class.active]="item.accepted === true" (click)="item.accepted = true">
+                {{ lang === 'fr' ? 'Accepter' : 'Accept' }}
               </button>
-              <button 
-                class="btn btn-reject" 
-                [class.active]="item.accepted === false" 
-                (click)="item.accepted = false">
-                Reject
+              <button class="btn btn-reject" [class.active]="item.accepted === false" (click)="item.accepted = false">
+                {{ lang === 'fr' ? 'Refuser' : 'Reject' }}
               </button>
             </div>
           </td>
         </tr>
-        
-        <!-- Labor Items -->
+
         <tr *ngFor="let l of labor" class="labor-row">
           <td><span class="reference-code">M1</span></td>
           <td>{{ l.designation }}</td>
           <td class="text-right">{{ l.qte }}</td>
           <td class="text-right">{{ l.amount / l.qte }} TND</td>
           <td class="text-right">{{ l.amount }} TND</td>
-          <td>
-            <!-- Labor items are not typically accepted/rejected individually -->
-          </td>
+          <td></td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Summary Section -->
-<div *ngIf="devis">
-  <div class="section-separator">
+  <div *ngIf="devis">
+    <div class="section-separator"></div>
+    <table class="summary-table">
+      <tr>
+        <td class="summary-label">{{ lang === 'fr' ? 'Sous-total' : 'Subtotal' }}</td>
+        <td class="summary-value">{{ devis.subtotal }} TND</td>
+      </tr>
+      <tr>
+        <td class="summary-label">{{ lang === 'fr' ? 'Remise' : 'Discount' }}</td>
+        <td class="summary-value">{{ devis.discount }} TND</td>
+      </tr>
+      <tr>
+        <td class="summary-label">{{ lang === 'fr' ? 'Taxe' : 'Tax' }} ({{ devis.tax }}%)</td>
+        <td class="summary-value">{{ devis.tax }} TND</td>
+      </tr>
+      <tr class="grand-total-row">
+        <td class="summary-label">{{ lang === 'fr' ? 'NET À PAYER' : 'NET TO PAY' }}</td>
+        <td class="summary-value grand-total-value">{{ grandTotal }} TND</td>
+      </tr>
+    </table>
   </div>
-  
-  <table class="summary-table">
-    <tr class="subtotal-row">
-      <td class="summary-label">Subtotal</td>
-      <td class="summary-value">{{ devis.subtotal }} TND</td>
-    </tr>
-    <tr class="discount-row">
-      <td class="summary-label">Discount</td>
-      <td class="summary-value">{{ devis.discount }} TND</td>
-    </tr>
-    <tr class="tax-row">
-      <td class="summary-label">Tax ({{ devis.tax }}% )</td>
-      <td class="summary-value">{{ devis.tax }} TND</td>
-    </tr>
-    <tr class="grand-total-row">
-      <td class="summary-label">NET TO PAY</td>
-      <td class="summary-value grand-total-value">{{ grandTotal }} TND</td>
-    </tr>
-  </table>
-</div>
 
-<!-- Comment Section with more visible title -->
-<div class="section-separator">
-  <img src="https://www.mercedes-benz.com/content/dam/brandhub/global/logos/MB-star_n_web.svg" alt="Mercedes Star" class="mercedes-star">
-</div>
+  <div class="section-separator">
+    <img src="https://www.mercedes-benz.com/content/dam/brandhub/global/logos/MB-star_n_web.svg" alt="Mercedes Star" class="mercedes-star">
+  </div>
 
-<div class="comment-form">
-  <h3 class="comment-section-title">Client Feedback</h3>
-  <textarea [ngModel]="comment" (ngModelChange)="comment = $event" class="comment-textarea" placeholder="Please provide any additional comments or questions..."></textarea>
-  <button (click)="submitResponse()" class="submit-button">
-    Submit Response
-    <i class="fas fa-paper-plane"></i>
-  </button>
+  <div class="comment-form">
+    <h3 class="comment-section-title">{{ lang === 'fr' ? 'Commentaire du Client' : 'Client Feedback' }}</h3>
+    <textarea [ngModel]="comment" (ngModelChange)="comment = $event" class="comment-textarea" [placeholder]="lang === 'fr' ? 'Ajoutez un commentaire ou une question...' : 'Please provide any additional comments or questions...'" ></textarea>
+    <button (click)="submitResponse()" class="submit-button">
+      {{ lang === 'fr' ? 'Envoyer la Réponse' : 'Submit Response' }}
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
 </div>

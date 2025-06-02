@@ -797,3 +797,13 @@ body {
   padding-top: 20px;
   border-top: 1px solid var(--border-color);
 }
+
+.invoice-meta {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.meta-item {
+  margin-top: 2px;
+}

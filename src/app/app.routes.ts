@@ -1,10 +1,21 @@
 import { Routes } from '@angular/router';
 import { ClientPortalComponent } from './client-portal/client-portal.component';
 import { ClientThankYouComponent } from './client-portal/client-thank-you.component';
+import { LanguageSelectorComponent } from './client-portal/language-selector.component';
 
 export const routes: Routes = [
-  { path: ':plate/:folderName', component: ClientPortalComponent },  // must be first
-  { path: ':plate', component: ClientPortalComponent },
+  // Language selection screen
+  { path: 'lang-select/:plate/:folderName', component: LanguageSelectorComponent },
+
+  // Client portal with language
+  { path: 'client-portal/:lang/:plate/:folderName', component: ClientPortalComponent },
+
+  // Thank-you page
   { path: 'thank-you', component: ClientThankYouComponent },
-  { path: '**', redirectTo: '' }
+
+  // Fallback
+  { path: '**', redirectTo: '' },
+
+  { path: 'client-portal/:lang/:plate/:folderName', component: ClientPortalComponent },
+
 ];
